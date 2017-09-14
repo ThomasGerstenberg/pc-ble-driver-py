@@ -36,48 +36,105 @@
 #
 
 import sys
-from threading                      import Condition, Lock
-from pc_ble_driver_py.observers import BLEDriverObserver 
+from threading import Condition, Lock
+import Queue
+from pc_ble_driver_py.observers import BLEDriverObserver
 
-def init(conn_ic_id):
-    global BLEDriver, BLEAdvData, BLEEvtID
-    from pc_ble_driver_py import config
-    config.__conn_ic_id__ = conn_ic_id
-    from pc_ble_driver_py.ble_driver    import BLEDriver, BLEAdvData, BLEEvtID
+from pc_ble_driver_py import config
+
+config.__conn_ic_id__ = "NRF52"
+from pc_ble_driver_py.ble_driver import BLEDriver, BLEAdvData, BLEEvtID, BLEGapSecStatus, BLEGapSecParams, BLEGapIOCaps, \
+    BLEGapSecKDist
+from pc_ble_driver_py.ble_adapter import BLEAdapter
+
 
 def main(serial_port):
     print("Serial port used: {}".format(serial_port))
-    driver      = BLEDriver(serial_port=serial_port, auto_flash=True)
-    observer    = TimeoutObserver()
-    adv_data    = BLEAdvData(complete_local_name='Example')
+    driver = BLEDriver(serial_port=serial_port)
+    adapter = BLEAdapter(driver)
+    observer = TimeoutObserver(adapter)
+    adv_data = BLEAdvData(complete_local_name='Example')
 
     driver.observer_register(observer)
     driver.open()
     driver.ble_enable()
     driver.ble_gap_adv_data_set(adv_data)
     driver.ble_gap_adv_start()
+    observer.wait_for_timeout(True)
+    observer.sec_reply(driver)
+    passkey = observer.q.get()
+
     observer.wait_for_timeout()
 
     print("Closing")
     driver.close()
 
+
 class TimeoutObserver(BLEDriverObserver):
-    def __init__(self):
+    def __init__(self, adapter):
+        """
+
+        :type adapter: BLEAdapter
+        """
         self.cond = Condition(Lock())
+        self.adapter = adapter
+        self.sec_cond = Condition(Lock())
+        self.conn_handle = 0
+        self.q = Queue.Queue()
 
     def on_gap_evt_timeout(self, ble_driver, conn_handle, src):
         with self.cond:
             self.cond.notify_all()
 
-    def wait_for_timeout(self):
-        with self.cond:
-            self.cond.wait()
+    def wait_for_timeout(self, sec=False):
+        cond = self.sec_cond if sec else self.cond
+        with cond:
+            cond.wait()
+
+    def on_gap_evt_connected(self, ble_driver, conn_handle, peer_addr, role, conn_params):
+        print("Connected")
+
+    def on_gap_evt_passkey_display(self, ble_driver, conn_handle, passkey_display):
+        print("Passkey Display, {}, {}, {}".format(conn_handle, passkey_display.passkey,
+                                                   passkey_display.match_request))
+        self.q.put(passkey_display.passkey)
+
+    def on_gap_evt_sec_params_request(self, ble_driver, conn_handle, peer_params):
+        """
+        :type ble_driver: BLEDriver
+        """
+        print("Sec params request")
+        self.conn_handle = conn_handle
+        with self.sec_cond:
+            self.sec_cond.notify_all()
+
+    def sec_reply(self, ble_driver):
+        print("Sending reply")
+        kdist_own = BLEGapSecKDist(enc=False,
+                                   id=False,
+                                   sign=False,
+                                   link=False)
+        kdist_peer = BLEGapSecKDist(enc=False,
+                                    id=False,
+                                    sign=False,
+                                    link=False)
+        sec_params = BLEGapSecParams(bond=False,
+                                     mitm=True,
+                                     lesc=False,
+                                     keypress=False,
+                                     io_caps=BLEGapIOCaps.display_only,
+                                     oob=False,
+                                     min_key_size=7,
+                                     max_key_size=16,
+                                     kdist_own=kdist_own,
+                                     kdist_peer=kdist_peer)
+        ble_driver.ble_gap_sec_params_reply(self.conn_handle, BLEGapSecStatus.success, sec_params, None, None)
+        print("After reply")
+
 
 if __name__ == "__main__":
-    if len(sys.argv) == 3:
-        init(sys.argv[1])
-        main(sys.argv[2])
+    if len(sys.argv) == 2:
+        main(sys.argv[1])
     else:
-        print("Invalid arguments. Parameters: <conn_ic_id> <serial_port>")
-        print("conn_ic_id: NRF51, NRF52")
+        print("Invalid arguments. Parameters: <serial_port>")
     quit()

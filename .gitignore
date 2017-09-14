@@ -10,3 +10,29 @@ python/**/*.txt
 python/**/lib/**/*.py
 python/dist/**
 python/*.egg-info/**
+
+# User-specific project settings
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries
+.idea/encodings.xml
+.idea/misc.xml
+
+# Sensitive or high-churn files:
+.idea/dataSources.ids
+.idea/dataSources.xml
+.idea/sqlDataSources.xml
+.idea/dynamic.xml
+.idea/uiDesigner.xml
+
+# build outputs
+build/
+dist/
+*egg-info/
+
+# Code coverage files
+.coverage
+_coverage/
+
+# Log Files
+log/
