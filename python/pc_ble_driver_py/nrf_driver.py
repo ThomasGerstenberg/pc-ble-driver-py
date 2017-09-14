@@ -319,10 +319,11 @@ class NrfDriver(object):
         assert isinstance(sec_status, BLEGapSecStatus),             'Invalid argument type'
         assert isinstance(sec_params, (BLEGapSecParams, NoneType)), 'Invalid argument type'
         assert isinstance(sec_keyset, BLEGapSecKeyset), 'Invalid argument type'
+
         return driver.sd_ble_gap_sec_params_reply(self.rpc_adapter,
                 conn_handle,
                 sec_status.value,
-                sec_params if sec_params else None,
+                sec_params.to_c() if sec_params else None,
                 sec_keyset.to_c())
 
     @NordicSemiErrorCheck

@@ -398,6 +398,12 @@ class BLEGapConnParams(object):
 
         return conn_params
 
+    def __str__(self):
+        return "%s(interval: [%r-%r] ms, timeout: %r ms, latency: %r)" % (
+            self.__class__.__name__, self.min_conn_interval_ms, self.max_conn_interval_ms,
+            self.conn_sup_timeout_ms, self.slave_latency
+        )
+
 
 class BLEGapAddr(object):
     class Types(Enum):

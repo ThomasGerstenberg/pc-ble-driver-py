@@ -40,13 +40,11 @@ import traceback
 from threading                          import Condition, Lock
 from pc_ble_driver_py.nrf_observers     import NrfDriverObserver
 
-def init(conn_ic_id):
-    global nrf_types, nrf_event, NrfAdapter
-    from pc_ble_driver_py import config
-    config.set_conn_ic(conn_ic_id)
-    from pc_ble_driver_py               import nrf_types
-    from pc_ble_driver_py               import nrf_event
-    from pc_ble_driver_py.nrf_adapter   import NrfAdapter
+from pc_ble_driver_py import config
+config.set_conn_ic("NRF52")
+from pc_ble_driver_py               import nrf_types
+from pc_ble_driver_py               import nrf_event
+from pc_ble_driver_py.nrf_adapter   import NrfAdapter
 
 def main(serial_port, baud_rate):
     print("Serial port used: {}".format(serial_port))
@@ -56,11 +54,12 @@ def main(serial_port, baud_rate):
         observer    = TimeoutObserver()
         adv_data    = nrf_types.BLEAdvData(complete_local_name='Example')
         adv_params  = adapter.driver.adv_params_setup()
-        adv_params.timeout_s = 10
+        adv_params.timeout_s = 90
 
         adapter.driver.observer_register(observer)
         adapter.driver.ble_gap_adv_data_set(adv_data)
         adapter.driver.ble_gap_adv_start(adv_params)
+
         observer.wait_for_timeout(adv_params.timeout_s)
     except:
         traceback.print_exc()
@@ -73,6 +72,7 @@ class TimeoutObserver(NrfDriverObserver):
         self.cond = Condition(Lock())
 
     def on_driver_event(self, nrf_driver, event):
+        print("Got event: {}".format(str(event)))
         if isinstance(event, nrf_event.GapEvtTimeout):
             with self.cond:
                 self.cond.notify_all()
@@ -80,14 +80,24 @@ class TimeoutObserver(NrfDriverObserver):
             print("Got connected")
             with self.cond:
                 self.cond.notify_all()
+        if isinstance(event, nrf_event.GapEvtSecParamsRequest):
+            print("Got sec params request")
+            kdist_own = nrf_types.BLEGapSecKeyDist()
+            kdist_peer = nrf_types.BLEGapSecKeyDist()
+            sec_params = nrf_types.BLEGapSecParams(False, True, False, False, nrf_event.GapIoCaps.DISPLAY_ONLY,
+                                                   False, 7, 16, kdist_own, kdist_peer)
+            nrf_driver.ble_gap_sec_params_reply(event.conn_handle, nrf_event.BLEGapSecStatus.success, sec_params,
+                                                nrf_types.BLEGapSecKeyset())
+        if isinstance(event, nrf_event.GapEvtPasskeyDisplay):
+            print("Got Passkey display: {}".format(str(event)))
 
     def wait_for_timeout(self, timeout):
         with self.cond:
             self.cond.wait(timeout)
 
+
 if __name__ == "__main__":
     if len(sys.argv) >= 3:
-        init(sys.argv[1])
         baud_rate = None
         if len(sys.argv) == 4:
             baud_rate = int(sys.argv[3])
