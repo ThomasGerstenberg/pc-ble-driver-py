@@ -13,22 +13,25 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-20.04
-            arch: x86_64
-          - os: ubuntu-20.04
-            arch: aarch64
+          # - os: ubuntu-20.04
+          #   arch: x86_64
+          # - os: ubuntu-20.04
+          #   arch: aarch64
           - os: macos-latest
             arch: x86_64
           - os: macos-latest
             arch: arm64
-          - os: windows-2019
-            arch: AMD64
+          # - os: windows-2019
+          #   arch: AMD64
       fail-fast: false
     runs-on: ${{ matrix.os }}
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
 
     - name: Set up QEMU
       if: matrix.arch == 'aarch64' && runner.os == 'Linux'
@@ -41,10 +44,13 @@ jobs:
         git checkout c0ffd419053e2405fffdb02ce7f1f9acceff4a66
 
     - name: Build wheels
-      uses: pypa/cibuildwheel@v2.17.0
+      uses: pypa/cibuildwheel@v2.19.0
       env:
-        CIBW_BUILD_VERBOSITY: 1
+        CIBW_BUILD_VERBOSITY: 3
         CIBW_ARCHS: ${{ matrix.arch || 'native' }}
+        CIBW_TEST_COMMAND: python -X faulthandler -c "from pc_ble_driver_py import config; config.__conn_ic_id__ = 'NRF52'; from pc_ble_driver_py import ble_driver; print('OK')"
+        CIBW_DEBUG_TRACEBACK: true
+        CIBW_REPAIR_WHEEL_COMMAND: ""
       with:
         output-dir: dist
 
