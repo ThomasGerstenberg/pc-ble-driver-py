@@ -21,8 +21,8 @@ jobs:
             arch: x86_64
           - os: macos-latest
             arch: arm64
-          # - os: windows-2019
-          #   arch: AMD64
+          - os: windows-2019
+            arch: AMD64
       fail-fast: false
     runs-on: ${{ matrix.os }}
 
