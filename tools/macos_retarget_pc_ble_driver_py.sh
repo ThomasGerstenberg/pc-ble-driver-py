@@ -62,8 +62,8 @@ echo
 #    grep : Find the entry with the path to the Python framework dependency
 #    cut : Cut on spaces and take only the first part (the path)
 #    xargs : strip off whitespace from the otool output
-TARGET_LIB=`otool -L $PYTHON_LOC | tail -n +2 | grep Python.framework | cut -d " " -f 1 | xargs`
-CURRENT_LIB=`otool -L $PC_BLE_DRIVER_LIB | tail -n +2 | grep Python.framework | cut -d " " -f 1 | xargs`
+TARGET_LIB=`otool -L $PYTHON_LOC | tail -n +2 | grep -m 1 Python.framework | cut -d " " -f 1 | xargs`
+CURRENT_LIB=`otool -L $PC_BLE_DRIVER_LIB | tail -n +2 | grep -m 1 Python.framework | cut -d " " -f 1 | xargs`
 
 # Sanity-check both paths are found
 if [[ -z $TARGET_LIB || -z $CURRENT_LIB ]]
