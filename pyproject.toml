@@ -18,23 +18,23 @@ exclude = [
 
 [tool.cibuildwheel]
 build = [
-    "cp310-manylinux_x86_64",
-    "cp310-manylinux_aarch64",
+    # "cp310-manylinux_x86_64",
+    # "cp310-manylinux_aarch64",
     "cp310-macosx_x86_64",
     "cp310-macosx_arm64",
-    "cp310-win_amd64",
+    # "cp310-win_amd64",
 
-    "cp311-manylinux_x86_64",
-    "cp311-manylinux_aarch64",
+    # "cp311-manylinux_x86_64",
+    # "cp311-manylinux_aarch64",
     "cp311-macosx_x86_64",
     "cp311-macosx_arm64",
-    "cp311-win_amd64",
+    # "cp311-win_amd64",
 
-    "cp312-manylinux_x86_64",
-    "cp312-manylinux_aarch64",
+    # "cp312-manylinux_x86_64",
+    # "cp312-manylinux_aarch64",
     "cp312-macosx_x86_64",
     "cp312-macosx_arm64",
-    "cp312-win_amd64",
+    # "cp312-win_amd64",
 ]
 
 [tool.cibuildwheel.environment]
