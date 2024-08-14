@@ -125,6 +125,10 @@ foreach(SD_API_VER ${SD_API_VERS})
         message(VERBOSE "Python library from the user flags is : ${PYTHON_LIBRARY_FROM_USER_FLAGS}")
     endif()
 
+    if (APPLE)
+        target_link_options(${PYTHON_MODULE_${SD_API_VER}} PRIVATE -lpython)
+    endif()
+
     message(VERBOSE "LINK_LIBRARIES are ${LINK_LIBRARIES}")
 
     target_link_libraries(${PYTHON_MODULE_${SD_API_VER}} PRIVATE ${LINK_LIBRARIES})
