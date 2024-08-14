@@ -81,7 +81,7 @@ echo "new:    $TARGET_LIB"
 echo
 
 # Change out the current lib with the target
-install_name_tool -change $CURRENT_LIB $TARGET_LIB $PC_BLE_DRIVER_LIB
+# install_name_tool -change $CURRENT_LIB $TARGET_LIB $PC_BLE_DRIVER_LIB
 
 # Verify the change worked
 echo "Testing that pc-ble-driver-py can be imported..."
