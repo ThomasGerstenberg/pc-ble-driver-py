@@ -62,8 +62,8 @@ echo
 #    grep : Find the entry with the path to the Python framework dependency
 #    cut : Cut on spaces and take only the first part (the path)
 #    xargs : strip off whitespace from the otool output
-echo "pc-ble-driver otool output"
-echo `otool -L $PC_BLE_DRIVER_LIB`
+echo "pc-ble-driver otool before"
+otool -L $PC_BLE_DRIVER_LIB
 
 TARGET_LIB=`otool -L $PYTHON_LOC | tail -n +2 | grep -m 1 Python.framework | cut -d " " -f 1 | xargs`
 CURRENT_LIB=`otool -L $PC_BLE_DRIVER_LIB | tail -n +2 | grep -m 1 Python.framework | cut -d " " -f 1 | xargs`
@@ -81,7 +81,11 @@ echo "new:    $TARGET_LIB"
 echo
 
 # Change out the current lib with the target
-# install_name_tool -change $CURRENT_LIB $TARGET_LIB $PC_BLE_DRIVER_LIB
+install_name_tool -change $CURRENT_LIB $TARGET_LIB $PC_BLE_DRIVER_LIB
+
+
+echo "pc-ble-driver otool after"
+otool -L $PC_BLE_DRIVER_LIB
 
 # Verify the change worked
 echo "Testing that pc-ble-driver-py can be imported..."
