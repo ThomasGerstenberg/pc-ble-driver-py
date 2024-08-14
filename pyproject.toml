@@ -40,7 +40,7 @@ build = [
 [tool.cibuildwheel.environment]
 VCPKG_FORCE_SYSTEM_BINARIES = 1   # Required for aarch64 builds
 NRF_BLE_DRIVER_VERSION = "4.1.100"
-CMAKE_ARGS = "-DCMAKE_PREFIX_PATH=pc-ble-driver/install --log-level=TRACE"
+CMAKE_ARGS = "-DCMAKE_PREFIX_PATH=pc-ble-driver/install --log-level=TRACE --verbose"
 
 [[tool.cibuildwheel.overrides]]
 select = "*-macosx_arm64"
