@@ -32,8 +32,8 @@ build = [
 
     # "cp312-manylinux_x86_64",
     # "cp312-manylinux_aarch64",
-    "cp312-macosx_x86_64",
-    "cp312-macosx_arm64",
+    # "cp312-macosx_x86_64",
+    # "cp312-macosx_arm64",
     # "cp312-win_amd64",
 ]
 
@@ -41,6 +41,7 @@ build = [
 VCPKG_FORCE_SYSTEM_BINARIES = 1   # Required for aarch64 builds
 NRF_BLE_DRIVER_VERSION = "4.1.100"
 CMAKE_ARGS = "-DCMAKE_PREFIX_PATH=pc-ble-driver/install"
+CMAKE_MESSAGE_LOG_LEVEL = "DEBUG"
 
 [[tool.cibuildwheel.overrides]]
 select = "*-macosx_arm64"
