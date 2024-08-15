@@ -6,12 +6,6 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 endif()
 # Name of the project
 project (pc-ble-driver-py)
-if(WIN32)
-    # Hack for building with Python limited API
-    # scikit-build links with python3x.lib, but setting PY_LIMITED_API will request python3.lib through a #pragma comment(lib,"python3.lib") in pyconfig.h
-    # since only the .lib path is passed (and not a library search dir), the build will fail because the linker won't know where to find python3.lib
-    cmake_path(REPLACE_FILENAME PYTHON_LIBRARY python3.lib)
-endif()
 # PYTHON_LIBRARY is changed by the PythonExtensions package, so a different variable is required to keep the original user flag
 set(PYTHON_LIBRARY_FROM_USER_FLAGS "${PYTHON_LIBRARY}")
 # Use non-debug version of python, even when building a debug version 
@@ -21,7 +15,7 @@ message(VERBOSE "CMAKE generator name: ${CMAKE_GENERATOR}")
 message(VERBOSE "CMAKE generator path ${CMAKE_MAKE_PROGRAM}")
 message(VERBOSE "CMAKE_MODULE_PATH before most other commands : ${CMAKE_MODULE_PATH}")
 message(VERBOSE "The include directories are (before PythonExtensions): ${PYTHON_INCLUDE_DIR}")
-find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
+find_package(PythonExtensions REQUIRED)
 message(VERBOSE "The include directories are (after PythonExtensions): ${PYTHON_INCLUDE_DIR}")
 message(VERBOSE "PythonExtension parameters")
 message(VERBOSE "PYTHON_EXECUTABLE                :   ${PYTHON_EXECUTABLE}                 ")

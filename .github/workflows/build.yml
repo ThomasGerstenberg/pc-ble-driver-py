@@ -13,16 +13,16 @@ jobs:
     strategy:
       matrix:
         include:
-          # - os: ubuntu-20.04
-          #   arch: x86_64
+          - os: ubuntu-20.04
+            arch: x86_64
           # - os: ubuntu-20.04
           #   arch: aarch64
           - os: macos-latest
             arch: x86_64
           - os: macos-latest
             arch: arm64
-          # - os: windows-2019
-          #   arch: AMD64
+          - os: windows-2019
+            arch: AMD64
       fail-fast: false
     runs-on: ${{ matrix.os }}
 
@@ -47,12 +47,7 @@ jobs:
     - name: Build wheels
       uses: pypa/cibuildwheel@v2.19.2
       env:
-        CIBW_BUILD_VERBOSITY: 1
         CIBW_ARCHS: ${{ matrix.arch || 'native' }}
-        CIBW_TEST_COMMAND: python -X faulthandler -c "from pc_ble_driver_py import config; config.__conn_ic_id__ = 'NRF52'; from pc_ble_driver_py import ble_driver; print('OK')"
-        # CIBW_TEST_COMMAND_MACOS: "{project}/tools/macos_retarget_pc_ble_driver_py.sh"
-        CIBW_DEBUG_TRACEBACK: true
-        CIBW_REPAIR_WHEEL_COMMAND_MACOS: ""
       with:
         output-dir: dist
 
