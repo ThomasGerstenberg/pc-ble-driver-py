@@ -86,14 +86,5 @@ before-all = [
 select = "*-win_*"
 inherit.before-all = "append"
 before-all = [
-    "python -m pip install cmake ninja",
-    "git clone https://github.com/microsoft/vcpkg.git",
-    "vcpkg\\bootstrap-vcpkg.bat",
-    "set VCPKG_ROOT=%CD%\\vcpkg",
-    "set PATH=%CD%\\vcpkg;%PATH%",
-    "vcpkg install spdlog asio",
-    "cd pc-ble-driver",
-    "cmake . -B build -DDISABLE_TESTS=1 -DDISABLE_EXAMPLES=1 -DSD_API_VER_NUMS=\"2;5\" -DNRF_BLE_DRIVER_VERSION=%NRF_BLE_DRIVER_VERSION%",
-    "cmake --build build --config Release",
-    "cmake --install build --config Release --prefix install",
+    "build-pc-ble-driver.bat",
 ]
