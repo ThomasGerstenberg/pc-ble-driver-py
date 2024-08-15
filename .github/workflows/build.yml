@@ -50,7 +50,7 @@ jobs:
         CIBW_BUILD_VERBOSITY: 1
         CIBW_ARCHS: ${{ matrix.arch || 'native' }}
         CIBW_TEST_COMMAND: python -X faulthandler -c "from pc_ble_driver_py import config; config.__conn_ic_id__ = 'NRF52'; from pc_ble_driver_py import ble_driver; print('OK')"
-        CIBW_TEST_COMMAND_MACOS: "{project}/tools/macos_retarget_pc_ble_driver_py.sh"
+        # CIBW_TEST_COMMAND_MACOS: "{project}/tools/macos_retarget_pc_ble_driver_py.sh"
         CIBW_DEBUG_TRACEBACK: true
         CIBW_REPAIR_WHEEL_COMMAND_MACOS: ""
       with:
