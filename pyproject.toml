@@ -37,7 +37,7 @@ build = [
     "cp312-macosx_arm64",
     "cp312-win_amd64",
 ]
-test-comand = "python -X faulthandler -c \"from pc_ble_driver_py import config; config.__conn_ic_id__ = 'NRF52'; from pc_ble_driver_py import ble_driver; print('OK')\""
+test-command = "python -X faulthandler -c \"from pc_ble_driver_py import config; config.__conn_ic_id__ = 'NRF52'; from pc_ble_driver_py import ble_driver; print('OK')\""
 
 [tool.cibuildwheel.macos]
 repair-wheel-command = ""
