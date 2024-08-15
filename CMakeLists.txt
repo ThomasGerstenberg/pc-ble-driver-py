@@ -6,12 +6,6 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
 endif()
 # Name of the project
 project (pc-ble-driver-py)
-if(WIN32)
-    # Hack for building with Python limited API
-    # scikit-build links with python3x.lib, but setting PY_LIMITED_API will request python3.lib through a #pragma comment(lib,"python3.lib") in pyconfig.h
-    # since only the .lib path is passed (and not a library search dir), the build will fail because the linker won't know where to find python3.lib
-    cmake_path(REPLACE_FILENAME PYTHON_LIBRARY python3.lib)
-endif()
 # PYTHON_LIBRARY is changed by the PythonExtensions package, so a different variable is required to keep the original user flag
 set(PYTHON_LIBRARY_FROM_USER_FLAGS "${PYTHON_LIBRARY}")
 # Use non-debug version of python, even when building a debug version 
@@ -24,12 +18,14 @@ message(VERBOSE "The include directories are (before PythonExtensions): ${PYTHON
 find_package(PythonExtensions REQUIRED)
 message(VERBOSE "The include directories are (after PythonExtensions): ${PYTHON_INCLUDE_DIR}")
 message(VERBOSE "PythonExtension parameters")
+message(VERBOSE "PYTHON_EXECUTABLE                :   ${PYTHON_EXECUTABLE}                 ")
 message(VERBOSE "PYTHON_PREFIX                    :   ${PYTHON_PREFIX}                     ")
+message(VERBOSE "PYTHON_LIBRARIES                 :   ${PYTHON_LIBRARIES}                  ")
+message(VERBOSE "PYTHON_LIBRARY_DIRS              :   ${PYTHON_LIBRARY_DIRS}               ")
 message(VERBOSE "PYTHON_SITE_PACKAGES_DIR         :   ${PYTHON_SITE_PACKAGES_DIR}          ")
 message(VERBOSE "PYTHON_RELATIVE_SITE_PACKAGES_DIR:   ${PYTHON_RELATIVE_SITE_PACKAGES_DIR} ")
 message(VERBOSE "PYTHON_SEPARATOR                 :   ${PYTHON_SEPARATOR}                  ")
 message(VERBOSE "PYTHON_PATH_SEPARATOR            :   ${PYTHON_PATH_SEPARATOR}             ")
-message(VERBOSE "PYTHON_EXTENSION_MODULE_SUFFIX   :   ${PYTHON_EXTENSION_MODULE_SUFFIX}    ")
 message(VERBOSE "PYTHON_EXTENSION_MODULE_SUFFIX   :   ${PYTHON_EXTENSION_MODULE_SUFFIX}    ")
 message(VERBOSE "CMAKE_MODULE_PATH after most other commands : ${CMAKE_MODULE_PATH}")
 
@@ -125,7 +121,7 @@ foreach(SD_API_VER ${SD_API_VERS})
         message(VERBOSE "Python library from the user flags is : ${PYTHON_LIBRARY_FROM_USER_FLAGS}")
     endif()
 
-    message(VERBOSE STATUS "LINK_LIBRARIES are ${LINK_LIBRARIES}")
+    message(VERBOSE "LINK_LIBRARIES are ${LINK_LIBRARIES}")
 
     target_link_libraries(${PYTHON_MODULE_${SD_API_VER}} PRIVATE ${LINK_LIBRARIES})
     target_compile_definitions(${PYTHON_MODULE_${SD_API_VER}} PRIVATE NRF_SD_BLE_API_VERSION=${SD_API_VER})

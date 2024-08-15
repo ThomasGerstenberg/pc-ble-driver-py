@@ -1,5 +1,13 @@
 [build-system]
-requires = ["setuptools", "wheel", "scikit-build", "cmake", "swig", "ninja", "tox"]
+requires = [
+    "setuptools",
+    "wheel",
+    "scikit-build",
+    "cmake",
+    "swig",
+    "ninja",
+    "tox"
+]
 
 [flake8]
 exclude = [
@@ -9,18 +17,47 @@ exclude = [
 ]
 
 [tool.cibuildwheel]
+build-verbosity = 1
 build = [
+    "cp38-manylinux_x86_64",
+    # "cp38-manylinux_aarch64",
+    "cp38-macosx_x86_64",
+    "cp38-macosx_arm64",
+    "cp38-win_amd64",
+
+    "cp39-manylinux_x86_64",
+    # "cp39-manylinux_aarch64",
+    "cp39-macosx_x86_64",
+    "cp39-macosx_arm64",
+    "cp39-win_amd64",
+
+    "cp310-manylinux_x86_64",
+    # "cp310-manylinux_aarch64",
+    "cp310-macosx_x86_64",
+    "cp310-macosx_arm64",
+    "cp310-win_amd64",
+
     "cp311-manylinux_x86_64",
-    "cp311-manylinux_aarch64",
+    # "cp311-manylinux_aarch64",
     "cp311-macosx_x86_64",
     "cp311-macosx_arm64",
     "cp311-win_amd64",
+
+    "cp312-manylinux_x86_64",
+    # "cp312-manylinux_aarch64",
+    "cp312-macosx_x86_64",
+    "cp312-macosx_arm64",
+    "cp312-win_amd64",
 ]
+test-command = "python -X faulthandler -c \"from pc_ble_driver_py import config; config.__conn_ic_id__ = 'NRF52'; from pc_ble_driver_py import ble_driver; print('OK')\""
+
+[tool.cibuildwheel.macos]
+repair-wheel-command = ""
 
 [tool.cibuildwheel.environment]
 VCPKG_FORCE_SYSTEM_BINARIES = 1   # Required for aarch64 builds
 NRF_BLE_DRIVER_VERSION = "4.1.100"
-CMAKE_ARGS = "-DCMAKE_PREFIX_PATH=pc-ble-driver/install"
+CMAKE_ARGS = "-DCMAKE_PREFIX_PATH=pc-ble-driver/install --log-level=TRACE"
 
 [[tool.cibuildwheel.overrides]]
 select = "*-macosx_arm64"
@@ -35,36 +72,17 @@ before-all = [
     "yum install -y zip systemd-devel",
 ]
 
+
 [[tool.cibuildwheel.overrides]]
 select = "*-{macosx,manylinux}_*"
 inherit.before-all = "append"
 before-all = [
-    "python -m pip install cmake ninja",
-    "rm -rf vcpkg",
-    "git clone https://github.com/microsoft/vcpkg.git",
-    "./vcpkg/bootstrap-vcpkg.sh",
-    "export VCPKG_ROOT=\"$(pwd)/vcpkg\"",
-    "export PATH=\"$VCPKG_ROOT:$PATH\"",
-    "vcpkg install spdlog asio",
-    "cd pc-ble-driver",
-    "git clean -fdx",
-    "cmake . -B build -DCMAKE_BUILD_TYPE=Release -DDISABLE_TESTS=1 -DDISABLE_EXAMPLES=1 -DSD_API_VER_NUMS=\"2;5\" -DNRF_BLE_DRIVER_VERSION=$NRF_BLE_DRIVER_VERSION $PC_BLE_DRIVER_ARCH",
-    "cmake --build build",
-    "cmake --install build --prefix install",
+    "./build-pc-ble-driver.sh",
 ]
 
 [[tool.cibuildwheel.overrides]]
 select = "*-win_*"
 inherit.before-all = "append"
 before-all = [
-    "python -m pip install cmake ninja",
-    "git clone https://github.com/microsoft/vcpkg.git",
-    "vcpkg\\bootstrap-vcpkg.bat",
-    "set VCPKG_ROOT=%CD%\\vcpkg",
-    "set PATH=%CD%\\vcpkg;%PATH%",
-    "vcpkg install spdlog asio",
-    "cd pc-ble-driver",
-    "cmake . -B build -DDISABLE_TESTS=1 -DDISABLE_EXAMPLES=1 -DSD_API_VER_NUMS=\"2;5\" -DNRF_BLE_DRIVER_VERSION=%NRF_BLE_DRIVER_VERSION%",
-    "cmake --build build --config Release",
-    "cmake --install build --config Release --prefix install",
+    "build-pc-ble-driver.bat",
 ]

@@ -37,10 +37,6 @@
 
 %module @SWIG_MODULE_NAME@
 
-%begin %{
-#define Py_LIMITED_API 0x03040000
-%}
-
 #ifdef _MSC_VER
     #if _MSC_VER == 1500 // 1500 == VC+ 9.0
         #include "stdint.h"

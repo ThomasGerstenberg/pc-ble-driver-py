@@ -20,7 +20,8 @@ dist
 _skbuild
 _cmake_test_compile
 **/test-results/
-
+pc-ble-driver/
+vcpkg/
 
 # Hidden utility-folders and files 
 **/delete_me*
